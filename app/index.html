@@ -1,0 +1,89 @@
+<html>
+<head>
+  <title>Lek og lær</title>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js" type="text/javascript"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+
+  <div class="container">
+    <h1>Hvem skal ut?</h1>
+    <div class="page"></div>
+  </div>
+  
+  <script type="text/template" id="velg-template">
+    <h2><%= resultat.get('tekst') %></h2>
+    <table class="table table-bordered">
+      <tbody>
+          <tr>
+            <td><button id="<%= bilder.get('svar1') %>" class="btn btn-primary"><%= bilder.get('bilde1') %></button></td>
+            <td><button id="<%= bilder.get('svar2') %>" class="btn btn-primary"><%= bilder.get('bilde2') %></button></td>
+          </tr>
+          <tr>
+            <td><button id="<%= bilder.get('svar3') %>" class="btn btn-primary"><%= bilder.get('bilde3') %></button></td>
+            <td><button id="<%= bilder.get('svar4') %>" class="btn btn-primary"><%= bilder.get('bilde4') %></button></td>
+          </tr>
+      </tbody>
+    </table>
+  </script>            
+  <script>
+  
+    var Resultat = Backbone.Model.extend({});
+    var Bilder = Backbone.Model.extend({});
+    
+    var bilder = new Bilder();
+    bilder.set({ bilde1: "Smilefjes1", svar1: "feil"
+                ,bilde2: "Smilefjes2", svar2: "feil"
+                ,bilde3: "Surpomp3", svar3: "riktig"
+                ,bilde4: "Smilefjes4", svar4: "feil"});
+    
+    var Router = Backbone.Router.extend({
+      routes: {
+        '':'home',
+        'riktig':'riktigValg'        
+      }
+    });
+    
+    var Velg = Backbone.View.extend({
+      el: '.page',
+      render: function () {
+        var resultat = new Resultat();
+        resultat.set({ tekst: ""});
+        var template = _.template($('#velg-template').html(), {resultat: resultat}, {bilder: bilder});
+        this.$el.html(template);  
+      },
+      events: {
+        'click #feil': 'feilValg',
+        'click #riktig': 'riktigValg'
+      },
+      feilValg: function() {
+        console.log("Feil valg");
+        var resultat = new Resultat();
+        resultat.set({ tekst: "FEIL VALG! Prøv igjen..."});
+        var template = _.template($('#velg-template').html(), {resultat: resultat}, {bilder: bilder});
+        this.$el.html(template); 
+      },
+      riktigValg: function() {
+        console.log("Riktig valg");
+        var resultat = new Resultat();
+        resultat.set({ tekst: "RIKTIG VALG!"});
+        var template = _.template($('#velg-template').html(), {resultat: resultat}, {bilder: bilder});
+        this.$el.html(template); 
+      }      
+    });
+    
+    var velg = new Velg();
+    var router = new Router();
+    
+    router.on('route:home', function() {
+      velg.render();
+    });
+     
+    Backbone.history.start();
+  </script>
+
+</body>
+</html>
